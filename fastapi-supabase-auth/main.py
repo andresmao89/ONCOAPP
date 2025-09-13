@@ -1,9 +1,9 @@
 ﻿import os
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import jwt
@@ -44,7 +44,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI(title="Auth API – FastAPI + Supabase", version="1.0.0")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+security = HTTPBearer()
 
 # ----------------------------
 # Modelos
@@ -84,7 +84,8 @@ def create_access_token(sub: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALG)
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security))-> UserOut:
+    token = credentials.credentials
     # Decodificar token
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
@@ -106,9 +107,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
 # ----------------------------
 # Endpoints
 # ----------------------------
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+
 
 
 @app.post("/register", response_model=UserOut, status_code=201)
