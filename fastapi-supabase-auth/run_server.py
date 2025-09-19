@@ -1,7 +1,4 @@
-﻿#!/usr/bin/env python3
-"""
-Script para iniciar el servidor FastAPI con manejo automático de puertos
-"""
+﻿#!python
 import uvicorn
 import socket
 import sys
