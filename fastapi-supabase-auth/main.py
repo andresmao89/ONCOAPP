@@ -1,5 +1,6 @@
 ﻿import os
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from urllib.parse import unquote
@@ -44,6 +45,18 @@ except Exception as e:
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI(title="Auth API – FastAPI + Supabase", version="1.0.0")
+
+origins = [
+    "https://onco-care-ai.onrender.com",  # opcional para desarrollo local
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 security = HTTPBearer()
 
